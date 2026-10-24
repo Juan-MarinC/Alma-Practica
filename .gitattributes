@@ -1,0 +1,6 @@
+# Saltos de línea LF en el repositorio y en la copia de trabajo (prettier/eslint esperan LF), aun con core.autocrlf=true.
+* text=auto eol=lf
+*.cmd text eol=crlf
+*.ico binary
+*.png binary
+*.jpg binary

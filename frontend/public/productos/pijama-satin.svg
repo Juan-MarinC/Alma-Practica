@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" role="img">
+<defs>
+<radialGradient id="fondo" cx=".32" cy=".22" r="1"><stop offset="0" stop-color="#fbeff3"/><stop offset="1" stop-color="#e6c3d0"/></radialGradient>
+<radialGradient id="piso"><stop offset="0" stop-color="#3d2b2b" stop-opacity=".35"/><stop offset="1" stop-color="#3d2b2b" stop-opacity="0"/></radialGradient>
+<linearGradient id="arco" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity=".12"/></linearGradient>
+<linearGradient id="oro" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f3dfb0"/><stop offset=".45" stop-color="#c9a063"/><stop offset=".7" stop-color="#e9cf93"/><stop offset="1" stop-color="#a87f45"/></linearGradient><linearGradient id="saten" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fbe4ec"/><stop offset=".5" stop-color="#eebdcd"/><stop offset="1" stop-color="#d798ae"/></linearGradient>
+<linearGradient id="brilloSaten" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".6"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+</defs>
+<rect width="800" height="1000" fill="url(#fondo)"/>
+<circle cx="660" cy="170" r="120" fill="#fff" opacity=".18"/>
+<circle cx="120" cy="820" r="160" fill="#fff" opacity=".12"/>
+<path d="M150 1000V430A250 250 0 0 1 650 430V1000Z" fill="url(#arco)"/>
+<path transform="translate(630 280)" d="M0 -17Q0 0 17 0Q0 0 0 17Q0 0 -17 0Q0 0 0 -17Z" fill="#fff" opacity="0.9"/><path transform="translate(170 450)" d="M0 -11Q0 0 11 0Q0 0 0 11Q0 0 -11 0Q0 0 0 -11Z" fill="#fff" opacity="0.7"/>
+<ellipse cx="400" cy="868" rx="260" ry="28.6" fill="url(#piso)" opacity="1"/>
+<rect x="210" y="690" width="380" height="160" rx="18" fill="#d798ae"/>
+<rect x="210" y="690" width="380" height="160" rx="18" fill="none" stroke="#5a3a40" stroke-width="5" opacity=".8"/>
+<path d="M400 690v160" stroke="#c07f96" stroke-width="3"/>
+<rect x="230" y="330" width="340" height="380" rx="20" fill="url(#saten)"/>
+<path d="M230 360q120 140 340 330" stroke="url(#brilloSaten)" stroke-width="80" fill="none" opacity=".6"/>
+<path d="M330 330l70 120 70-120" fill="#f6d0dc" stroke="#5a3a40" stroke-width="5" stroke-linejoin="round"/>
+<path d="M330 330l-46 70 60 30 56 20M470 330l46 70-60 30-56 20" fill="none" stroke="#5a3a40" stroke-width="5" stroke-linejoin="round"/>
+<path d="M400 450v260" stroke="#c07f96" stroke-width="3"/>
+<circle cx="400" cy="500" r="9" fill="#fff4f7" stroke="#5a3a40" stroke-width="3"/><circle cx="400" cy="570" r="9" fill="#fff4f7" stroke="#5a3a40" stroke-width="3"/><circle cx="400" cy="640" r="9" fill="#fff4f7" stroke="#5a3a40" stroke-width="3"/>
+<path d="M460 520h70v60q-35 12-70 0Z" fill="none" stroke="#5a3a40" stroke-width="5" stroke-linejoin="round"/>
+<rect x="230" y="330" width="340" height="380" rx="20" fill="none" stroke="#c07f96" stroke-width="3"/>
+</svg>

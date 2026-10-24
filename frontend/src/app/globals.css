@@ -1,0 +1,99 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-crema: #fbf7f4;
+  --color-blush: #f3dcd6;
+  --color-rosa: #c27c7c; /* acento: títulos grandes, íconos, barras (3:1) */
+  --color-vino: #a45a60; /* rosa para texto pequeño y fondos con texto blanco (≥4.5:1) */
+  --color-cacao: #3d2b2b;
+  --color-oro: #b8956a;
+  --font-sans: var(--font-manrope);
+  --font-serif: var(--font-cormorant);
+}
+
+html {
+  caret-color: var(--color-rosa);
+  accent-color: var(--color-cacao);
+  scrollbar-color: color-mix(in srgb, var(--color-cacao) 25%, transparent) transparent;
+}
+
+body {
+  background: var(--color-crema);
+  color: var(--color-cacao);
+  /* Cifras de altura uniforme y ancho fijo: precios y tablas alineados (Cormorant usa cifras antiguas por defecto). */
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+/* En la capa base para que un campo con su propio anillo de foco (focus:outline-none + ring) no muestre dos contornos. */
+@layer base {
+  :focus-visible {
+    outline: 2px solid var(--color-rosa);
+    outline-offset: 3px;
+  }
+
+  /* La "×" nativa de los campos de búsqueda (Chrome, Edge, Safari) en cacao en vez del azul del navegador. */
+  input[type="search"]::-webkit-search-cancel-button {
+    appearance: none;
+    width: 1rem;
+    height: 1rem;
+    cursor: pointer;
+    background: var(--color-cacao);
+    opacity: 0.6;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M18 6 6 18M6 6l12 12'/%3E%3C/svg%3E") center / contain no-repeat;
+  }
+  input[type="search"]::-webkit-search-cancel-button:hover {
+    opacity: 1;
+  }
+}
+
+/* Cormorant es muy fina: los títulos van en 600 para que se lean con presencia. Úsala solo en títulos grandes (desde text-2xl). */
+@layer base {
+  .font-serif {
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+}
+
+::selection {
+  background: var(--color-blush);
+}
+
+/* Piezas del panel de administración */
+@layer components {
+  .tarjeta-admin {
+    @apply rounded-3xl bg-white p-6 text-cacao ring-1 ring-cacao/10;
+  }
+  .etiqueta {
+    @apply mb-1 block text-sm text-cacao/70;
+  }
+  .ayuda {
+    @apply mt-1 block text-xs text-cacao/50;
+  }
+  .campo {
+    @apply block min-h-11 w-full rounded-xl bg-crema px-3 py-2 ring-1 ring-cacao/15 focus:ring-2 focus:ring-rosa focus:outline-none;
+  }
+  .boton-primario {
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-cacao px-5 py-2.5 text-sm text-crema transition hover:bg-cacao/90 disabled:opacity-50;
+  }
+  .boton-secundario {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm text-cacao ring-1 ring-cacao/20 transition hover:ring-cacao/50;
+  }
+}
+
+/* Entrada del inicio en CSS: se ve desde el primer pintado, sin esperar la hidratación. */
+@keyframes aparecer {
+  from { opacity: 0; transform: translateY(0.35em); filter: blur(6px); }
+}
+
+.aparecer {
+  animation: aparecer 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

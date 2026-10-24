@@ -1,0 +1,17 @@
+node_modules/
+.next/
+dist/
+.env
+*.tsbuildinfo
+.env.*
+!.env.example
+*.log
+.pgdata/
+coverage/
+
+# Generado o local de cada equipo
+graphify-out/
+_to_delete/
+.claude/settings.local.json
+# Skills de terceros: se reinstalan desde skills-lock.json
+.claude/skills/
