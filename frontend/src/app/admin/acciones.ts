@@ -9,9 +9,9 @@ import { excedeLimite, ipCliente, MINUTO } from "@/lib/limite";
 export type EstadoFormulario = { errores: string[] };
 
 export async function iniciarSesion(_: EstadoFormulario, datos: FormData): Promise<EstadoFormulario> {
-  // Por IP y además un tope total: aunque se falseen IPs, no se pueden probar claves sin límite.
-  const ip = await ipCliente();
-  if (excedeLimite(`login:${ip}`, 10, 15 * MINUTO) || excedeLimite("login:total", 50, 15 * MINUTO)) {
+  // Solo por IP: un tope total dejaría que cualquiera bloquee el panel fallando a propósito.
+  // Con ADMIN_CLAVE de 12+ caracteres, 10 intentos por IP cada 15 min hacen inviable adivinarla.
+  if (excedeLimite(`login:${await ipCliente()}`, 10, 15 * MINUTO)) {
     return { errores: ["Demasiados intentos. Espera unos minutos e intenta de nuevo."] };
   }
   if (await abrirSesion(String(datos.get("clave") ?? ""))) redirect("/admin");
