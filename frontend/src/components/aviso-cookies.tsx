@@ -33,7 +33,7 @@ export function AvisoCookies() {
       className="aparecer fixed inset-x-3 bottom-3 z-40 flex flex-col gap-3 rounded-2xl bg-white/95 p-4 text-sm text-cacao ring-1 ring-cacao/10 backdrop-blur sm:right-auto sm:left-5 sm:max-w-sm sm:flex-row sm:items-center"
     >
       <p className="text-cacao/85">
-        Solo guardamos lo necesario para que tu bolsa funcione; no usamos cookies de publicidad.{" "}
+        Solo guardamos lo necesario para tu bolsa y tu sesión; no usamos cookies de publicidad.{" "}
         <Link href="/privacidad#cookies" className="underline underline-offset-2 hover:text-vino">
           Más información
         </Link>

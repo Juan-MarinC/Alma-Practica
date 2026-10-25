@@ -3,6 +3,7 @@ import {
   ConflictException,
   Controller,
   Get,
+  Headers,
   HttpCode,
   NotFoundException,
   Param,
@@ -13,6 +14,8 @@ import {
   UnprocessableEntityException,
   UseGuards,
 } from '@nestjs/common';
+import { ResolverSesion } from '../../../clientes/application/acceso.js';
+import { tokenBearer } from '../../../clientes/infrastructure/http/cliente.guard.js';
 import { IniciarPago } from '../../../pagos/application/pagos.js';
 import { PasarelaNoConfigurada } from '../../../pagos/domain/pago.js';
 import { AdminGuard } from '../../../shared/auth/admin.guard.js';
@@ -42,14 +45,17 @@ export class PedidosController {
     private readonly crearPedido: CrearPedido,
     private readonly consultarPedido: ConsultarPedido,
     private readonly iniciarPago: IniciarPago,
+    private readonly resolverSesion: ResolverSesion,
   ) {}
 
+  // Con sesión de clienta el pedido queda en su cuenta; sin sesión (o vencida) es compra como invitada.
   @Post()
   @HttpCode(201)
-  async crear(@Body() datos: unknown) {
+  async crear(@Body() datos: unknown, @Headers('authorization') cabecera?: string) {
     try {
       if (!this.iniciarPago.disponible()) throw new PasarelaNoConfigurada();
-      const pedido = await this.crearPedido.ejecutar(datos);
+      const clienteId = await this.resolverSesion.ejecutar(tokenBearer(cabecera));
+      const pedido = await this.crearPedido.ejecutar(datos, clienteId);
       return { id: pedido.id, numero: pedido.numero, urlPago: await this.iniciarPago.ejecutar(pedido, urlRetorno(pedido.id)) };
     } catch (e) {
       aHttp(e);

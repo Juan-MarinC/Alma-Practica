@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ClientesModule } from '../clientes/clientes.module.js';
 import { PagosModule } from '../pagos/pagos.module.js';
 import {
   CambiarEstadoPedido,
@@ -12,7 +13,7 @@ import { AdminPedidosController, PedidosController } from './infrastructure/http
 import { RepositorioPedidosPostgres } from './infrastructure/postgres/repositorio-pedidos-postgres.js';
 
 @Module({
-  imports: [PagosModule],
+  imports: [PagosModule, ClientesModule],
   controllers: [PedidosController, AdminPedidosController],
   providers: [
     CrearPedido,

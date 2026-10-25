@@ -17,6 +17,18 @@ export default function PaginaPrivacidad() {
         Nombre, correo, celular y dirección de envío. Los usamos solo para procesar tu pedido, enviarlo, informarte su estado y
         atender cambios o reembolsos. Los pagos los procesa Wompi: nosotros no vemos ni guardamos los datos de tu tarjeta o cuenta.
       </p>
+      <h2 id="cuenta" className="scroll-mt-32 font-serif text-2xl text-cacao">Si creas una cuenta</h2>
+      <p>
+        Crear una cuenta es opcional. Si la creas guardamos tu nombre, correo, celular (si lo das), tus direcciones guardadas y tu
+        contraseña, que se almacena cifrada de forma irreversible: nadie en la tienda puede verla. Si entras con Google, Google nos
+        comparte tu nombre, tu correo y un identificador de tu cuenta de Google; no recibimos tu contraseña de Google. Usamos estos
+        datos solo para que entres, veas tus pedidos y compres más rápido.
+      </p>
+      <p>
+        Puedes corregir tus datos o eliminar tu cuenta cuando quieras desde «Mi cuenta». Al eliminarla borramos tu cuenta, tus
+        direcciones y tus sesiones; los pedidos se conservan porque la ley nos obliga a guardar los registros de venta, pero dejan de
+        estar ligados a una cuenta.
+      </p>
       <h2 className="font-serif text-2xl text-cacao">Con quién los compartimos</h2>
       <p>Solo con la pasarela de pagos y la transportadora que entrega tu pedido, en lo necesario para cumplir la compra.</p>
       <h2 className="font-serif text-2xl text-cacao">Tus derechos</h2>
@@ -33,6 +45,11 @@ export default function PaginaPrivacidad() {
           finalizas la compra y se quedan ahí hasta que vacías la bolsa o borras los datos del sitio.
         </li>
         <li>
+          <strong className="font-medium text-cacao">Tu sesión:</strong> si entras a tu cuenta, una cookie segura (no accesible desde
+          el navegador) te mantiene dentro hasta 30 días o hasta que cierres sesión. Mientras entras con Google se usa otra por 10
+          minutos para comprobar que la respuesta de Google es para ti.
+        </li>
+        <li>
           <strong className="font-medium text-cacao">El aviso de cookies:</strong> recordamos que ya lo viste para no mostrártelo de
           nuevo.
         </li>
@@ -43,7 +60,8 @@ export default function PaginaPrivacidad() {
       </ul>
       <p>
         Algunos servicios externos reciben datos técnicos de tu navegador (como tu dirección IP) al usarlos: las fotos de los productos se
-        cargan desde Unsplash y el pago ocurre en Wompi, cada uno con su propia política de privacidad.
+        cargan desde Unsplash, el pago ocurre en Wompi y el inicio con Google ocurre en Google, cada uno con su propia política de
+        privacidad.
       </p>
       <p>
         Puedes borrar esta información cuando quieras desde la configuración de tu navegador (datos del sitio). Si en el futuro usamos

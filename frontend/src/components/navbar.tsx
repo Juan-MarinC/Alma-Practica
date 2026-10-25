@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion, useMotionValueEvent, useScroll } from "motion/react";
-import { Menu, Search, ShoppingBag, X } from "lucide-react";
+import { Menu, Search, ShoppingBag, User, X } from "lucide-react";
 import { useState } from "react";
 import { tienda } from "@/lib/config";
 import { categorias } from "@/lib/data";
@@ -54,6 +54,10 @@ export function Navbar() {
           <div className="flex items-center gap-1">
             <Link href="/catalogo?buscar" aria-label="Buscar" className="grid size-11 place-items-center rounded-full text-cacao/80 hover:bg-cacao/5">
               <Search className="size-[18px]" />
+            </Link>
+            {/* Sin estado de sesión aquí: /cuenta manda a entrar si no hay sesión, y el navbar sigue siendo estático. */}
+            <Link href="/cuenta" aria-label="Mi cuenta" className="grid size-11 place-items-center rounded-full text-cacao/80 hover:bg-cacao/5">
+              <User className="size-[18px]" />
             </Link>
             <button onClick={abrir} aria-label="Abrir carrito" className="relative grid size-11 place-items-center rounded-full text-cacao/80 hover:bg-cacao/5">
               <ShoppingBag className="size-[18px]" />

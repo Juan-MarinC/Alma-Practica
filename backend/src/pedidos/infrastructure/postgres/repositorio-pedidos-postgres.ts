@@ -38,13 +38,13 @@ export class RepositorioPedidosPostgres implements RepositorioPedidos {
     return rows;
   }
 
-  async crear(pedido: PedidoNuevo) {
+  async crear(pedido: PedidoNuevo, clienteId: string | null) {
     const cliente = await this.pool.connect();
     try {
       await cliente.query('BEGIN');
       const { rows } = await cliente.query<{ id: string; numero: number }>(
-        `INSERT INTO pedidos (contacto, envio, subtotal, costo_envio, total) VALUES ($1, $2, $3, $4, $5) RETURNING id, numero`,
-        [pedido.contacto, pedido.envio, pedido.subtotal, pedido.costoEnvio, pedido.total],
+        `INSERT INTO pedidos (contacto, envio, subtotal, costo_envio, total, cliente_id) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, numero`,
+        [pedido.contacto, pedido.envio, pedido.subtotal, pedido.costoEnvio, pedido.total, clienteId],
       );
       await cliente.query(
         `INSERT INTO pedido_items (pedido_id, variante_id, cantidad, precio_unitario)

@@ -47,7 +47,10 @@ CREATE TABLE clientes (
   nombre          TEXT NOT NULL,
   email           TEXT UNIQUE NOT NULL,
   telefono        TEXT,
-  contrasena_hash TEXT,
+  contrasena_hash TEXT,                  -- NULL si solo entra con Google
+  email_verificado BOOLEAN NOT NULL DEFAULT false,
+  google_sub      TEXT UNIQUE,
+  acepta_datos_en TIMESTAMPTZ,
   creado_en       TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
@@ -57,7 +60,25 @@ CREATE TABLE direcciones (
   departamento TEXT NOT NULL,
   ciudad       TEXT NOT NULL,
   direccion    TEXT NOT NULL,
-  indicaciones TEXT
+  indicaciones TEXT,
+  creada_en    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX direcciones_cliente_idx ON direcciones (cliente_id);
+
+CREATE TABLE sesiones_cliente (
+  token_hash TEXT PRIMARY KEY,           -- SHA-256 del token: la cookie no sirve si se filtra la base
+  cliente_id UUID NOT NULL REFERENCES clientes(id) ON DELETE CASCADE,
+  expira     TIMESTAMPTZ NOT NULL,
+  creada_en  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX sesiones_cliente_idx ON sesiones_cliente (cliente_id);
+
+CREATE TABLE enlaces_cliente (
+  token_hash TEXT PRIMARY KEY,
+  cliente_id UUID NOT NULL REFERENCES clientes(id) ON DELETE CASCADE,
+  tipo       TEXT NOT NULL CHECK (tipo IN ('verificar_email', 'restablecer_contrasena')),
+  expira     TIMESTAMPTZ NOT NULL,
+  usado_en   TIMESTAMPTZ
 );
 
 CREATE TYPE estado_pedido AS ENUM ('pendiente_pago', 'pagado', 'preparando', 'enviado', 'entregado', 'cancelado');
@@ -65,7 +86,7 @@ CREATE TYPE estado_pedido AS ENUM ('pendiente_pago', 'pagado', 'preparando', 'en
 CREATE TABLE pedidos (
   id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   numero      SERIAL UNIQUE,
-  cliente_id  UUID REFERENCES clientes(id),
+  cliente_id  UUID REFERENCES clientes(id) ON DELETE SET NULL,  -- al borrar la cuenta el pedido se conserva
   contacto    JSONB NOT NULL,          -- nombre, email, teléfono (sirve para compras como invitada)
   envio       JSONB NOT NULL,          -- departamento, ciudad, dirección
   estado      estado_pedido NOT NULL DEFAULT 'pendiente_pago',
@@ -75,6 +96,8 @@ CREATE TABLE pedidos (
   guia_envio  TEXT,
   creado_en   TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+CREATE INDEX pedidos_cliente_idx ON pedidos (cliente_id);
+CREATE INDEX pedidos_email_idx ON pedidos (lower(contacto->>'email'));
 
 CREATE TABLE pedido_items (
   pedido_id       UUID NOT NULL REFERENCES pedidos(id) ON DELETE CASCADE,

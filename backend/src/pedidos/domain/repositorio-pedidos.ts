@@ -37,7 +37,8 @@ export type FilaPedidoAdmin = {
 
 export interface RepositorioPedidos {
   variantesVendibles(skus: string[]): Promise<VarianteVendible[]>;
-  crear(pedido: PedidoNuevo): Promise<{ id: string; numero: number }>;
+  /** `clienteId` liga el pedido a una cuenta; null para compras como invitada. */
+  crear(pedido: PedidoNuevo, clienteId: string | null): Promise<{ id: string; numero: number }>;
   resumen(id: string): Promise<ResumenPedido | null>;
   detalleAdmin(id: string): Promise<PedidoAdmin | null>;
   listarAdmin(): Promise<FilaPedidoAdmin[]>;

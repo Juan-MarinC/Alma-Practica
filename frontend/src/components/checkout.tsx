@@ -2,18 +2,23 @@
 
 import { Lock } from "lucide-react";
 import Link from "next/link";
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { crearPedido } from "@/app/(tienda)/checkout/acciones";
 import { departamentos } from "@/lib/colombia";
 import { tienda } from "@/lib/config";
+import type { Direccion } from "@/lib/cuenta";
 import { formatoPrecio } from "@/lib/format";
 import { sinReiniciar } from "@/lib/formularios";
 import { useCarrito } from "./carrito";
 
+type DatosCuenta = { nombre: string; email: string; telefono: string | null };
+
 // Checkout sobrio: sin animaciones, para no distraer al pagar.
-export function Checkout() {
+export function Checkout({ cuenta = null, direcciones = [] }: { cuenta?: DatosCuenta | null; direcciones?: Direccion[] }) {
   const { items, subtotal, listo } = useCarrito();
   const [estado, enviar, enviando] = useActionState(crearPedido, { errores: [] });
+  const [elegida, setElegida] = useState<number | "nueva">(direcciones[0]?.id ?? "nueva");
+  const dir = direcciones.find((d) => d.id === elegida);
   const envio = subtotal >= tienda.envioGratisDesde ? 0 : tienda.envioFijo;
 
   if (!listo) return <div className="min-h-[50vh]" />;
@@ -35,21 +40,33 @@ export function Checkout() {
           </div>
         )}
 
+        <p className="rounded-2xl bg-cacao/5 px-4 py-3 text-sm text-cacao/85">
+          {cuenta ? (
+            <>Compras con tu cuenta ({cuenta.email}). El pedido quedará en <Link href="/cuenta#pedidos" className="underline underline-offset-2">Mis pedidos</Link>.</>
+          ) : (
+            <>
+              ¿Tienes cuenta?{" "}
+              <Link href="/cuenta/entrar?volver=/checkout" className="text-cacao underline underline-offset-2">Entra</Link> para usar tus datos y
+              direcciones guardadas, o sigue como invitada.
+            </>
+          )}
+        </p>
+
         <fieldset className="tarjeta-admin">
           <legend className="float-left mb-5 w-full font-serif text-2xl">Tus datos</legend>
           <div className="clear-left grid gap-4 md:grid-cols-2">
           <label className="md:col-span-2">
             <span className="etiqueta">Nombre completo</span>
-            <input name="nombre" required minLength={3} maxLength={120} autoComplete="name" className="campo" />
+            <input name="nombre" required minLength={3} maxLength={120} autoComplete="name" defaultValue={cuenta?.nombre} className="campo" />
           </label>
           <label>
             <span className="etiqueta">Correo electrónico</span>
-            <input name="email" type="email" required autoComplete="email" className="campo" />
+            <input name="email" type="email" required autoComplete="email" defaultValue={cuenta?.email} className="campo" />
             <span className="ayuda">Aquí te llega la confirmación del pedido.</span>
           </label>
           <label>
             <span className="etiqueta">Celular</span>
-            <input name="telefono" type="tel" required inputMode="tel" autoComplete="tel-national" placeholder="300 123 4567" className="campo" />
+            <input name="telefono" type="tel" required inputMode="tel" autoComplete="tel-national" placeholder="300 123 4567" defaultValue={cuenta?.telefono ?? undefined} className="campo" />
             <span className="ayuda">Para coordinar la entrega.</span>
           </label>
           </div>
@@ -57,26 +74,42 @@ export function Checkout() {
 
         <fieldset className="tarjeta-admin">
           <legend className="float-left mb-5 w-full font-serif text-2xl">Dirección de envío</legend>
-          <div className="clear-left grid gap-4 md:grid-cols-2">
+          {direcciones.length > 0 && (
+            <label className="clear-left mb-4 block">
+              <span className="etiqueta">Usar una dirección guardada</span>
+              <select value={String(elegida)} onChange={(e) => setElegida(e.target.value === "nueva" ? "nueva" : Number(e.target.value))} className="campo">
+                {direcciones.map((d) => <option key={d.id} value={d.id}>{d.direccion}, {d.ciudad}</option>)}
+                <option value="nueva">Otra dirección…</option>
+              </select>
+            </label>
+          )}
+          {/* key: al cambiar de dirección guardada los campos se vuelven a llenar con sus datos. */}
+          <div key={String(elegida)} className="clear-left grid gap-4 md:grid-cols-2">
           <label>
             <span className="etiqueta">Departamento</span>
-            <select name="departamento" required defaultValue="" autoComplete="address-level1" className="campo">
+            <select name="departamento" required defaultValue={dir?.departamento ?? ""} autoComplete="address-level1" className="campo">
               <option value="" disabled>Elige…</option>
               {departamentos.map((d) => <option key={d}>{d}</option>)}
             </select>
           </label>
           <label>
             <span className="etiqueta">Ciudad o municipio</span>
-            <input name="ciudad" required maxLength={80} autoComplete="address-level2" className="campo" />
+            <input name="ciudad" required maxLength={80} autoComplete="address-level2" defaultValue={dir?.ciudad} className="campo" />
           </label>
           <label className="md:col-span-2">
             <span className="etiqueta">Dirección</span>
-            <input name="direccion" required minLength={5} maxLength={200} autoComplete="street-address" placeholder="Calle 10 # 20-30, apto 501" className="campo" />
+            <input name="direccion" required minLength={5} maxLength={200} autoComplete="street-address" placeholder="Calle 10 # 20-30, apto 501" defaultValue={dir?.direccion} className="campo" />
           </label>
           <label className="md:col-span-2">
             <span className="etiqueta">Indicaciones (opcional)</span>
-            <input name="indicaciones" maxLength={200} placeholder="Barrio, torre, portería…" className="campo" />
+            <input name="indicaciones" maxLength={200} placeholder="Barrio, torre, portería…" defaultValue={dir?.indicaciones} className="campo" />
           </label>
+          {cuenta && elegida === "nueva" && (
+            <label className="flex items-center gap-3 text-sm text-cacao/85 md:col-span-2">
+              <input type="checkbox" name="guardarDireccion" defaultChecked className="size-4 accent-cacao" />
+              Guardar esta dirección en mi cuenta
+            </label>
+          )}
           </div>
         </fieldset>
 

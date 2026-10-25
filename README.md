@@ -48,6 +48,12 @@ Para generar ADMIN_TOKEN: `node -e "console.log(require('crypto').randomBytes(32
 3. Prueba una compra con los [datos de prueba de Wompi](https://docs.wompi.co/docs/colombia/datos-de-prueba-en-sandbox/). Para pasar a producción cambia a las llaves `prod` y `WOMPI_API_URL=https://production.wompi.co/v1`.
 4. Correos de confirmación (opcional): crea una cuenta en [Resend](https://resend.com) y llena `RESEND_API_KEY`, `CORREO_REMITENTE` y `CORREO_TIENDA`.
 
+### 5. Cuentas de clientas (http://localhost:3000/cuenta)
+- Las clientas pueden crear cuenta con correo y contraseña o con Google; comprar como invitada sigue siendo posible. En la cuenta ven sus pedidos, guardan direcciones, editan sus datos, cambian la contraseña y pueden eliminar la cuenta.
+- Si tu base de datos es anterior a las cuentas, aplica la migración: `psql "<DATABASE_URL>" -f backend/db/migraciones/001-cuentas.sql`.
+- Sin Resend, los correos de confirmación y de recuperar contraseña no se envían: en desarrollo el enlace aparece en la consola del backend.
+- **Google** (opcional): en [Google Cloud Console](https://console.cloud.google.com/apis/credentials) crea un "ID de cliente OAuth" de tipo aplicación web, agrega como URI de redirección `http://localhost:3000/cuenta/google/retorno` (y la de tu dominio al lanzar) y copia el ID y el secreto en `GOOGLE_CLIENT_ID` y `GOOGLE_CLIENT_SECRET` de `backend/.env`.
+
 ### Datos personales
 - Llaves y correos de la tienda viven solo en archivos `.env`, que Git ignora.
 - Los datos de las clientas no viajan en URLs, no aparecen en los registros del servidor y la página pública del pedido no los muestra; solo el panel los ve.
@@ -74,4 +80,5 @@ backend/src/catalogo/
 1. ✅ Alcance y diseño → [docs/01-alcance.md](docs/01-alcance.md)
 2. ✅ Base técnica: tienda conectada al backend y panel de administración de productos
 3. ✅ Pagos y pedidos: checkout como invitada, Wompi con webhooks firmados, stock descontado al aprobarse el pago, correos y pedidos en el panel
+   - ✅ Cuentas de clientas: correo y contraseña o Google, historial de pedidos, direcciones guardadas y eliminación de la cuenta
 4. Lanzamiento (hosting, dominio, pruebas, facturación electrónica DIAN)

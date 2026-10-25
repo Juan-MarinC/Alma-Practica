@@ -22,7 +22,9 @@ export class CorreoResend implements Correo {
     const llave = process.env.RESEND_API_KEY;
     const remitente = process.env.CORREO_REMITENTE;
     if (!llave || !remitente) {
-      this.log.warn(`Correo no enviado (configura RESEND_API_KEY y CORREO_REMITENTE): "${asunto}"`);
+      // Solo en desarrollo: muestra los enlaces del correo para poder probar la confirmación y la recuperación sin Resend.
+      const enlaces = process.env.NODE_ENV === 'production' ? [] : [...html.matchAll(/href="([^"]+)"/g)].map((m) => m[1]);
+      this.log.warn(`Correo no enviado (configura RESEND_API_KEY y CORREO_REMITENTE): "${asunto}"${enlaces.length ? ` -> ${enlaces.join(' ')}` : ''}`);
       return;
     }
     const r = await fetch('https://api.resend.com/emails', {
