@@ -1,4 +1,6 @@
 // Dominio puro: no depende de NestJS, Postgres ni HTTP.
+import { DatosInvalidos, esObjeto, objeto } from '../../shared/validacion.js';
+
 export type Variante = {
   sku: string;
   opciones: Record<string, string>;
@@ -40,11 +42,7 @@ export class ProductoNoEncontrado extends Error {
   }
 }
 
-export class DatosInvalidos extends Error {
-  constructor(readonly errores: string[]) {
-    super(errores.join('; '));
-  }
-}
+export { DatosInvalidos };
 
 export class ConflictoProducto extends Error {}
 
@@ -53,8 +51,6 @@ const SKU = /^[A-Za-z0-9._-]{1,64}$/;
 const PRECIO_MAX = 100_000_000;
 const STOCK_MAX = 1_000_000;
 
-const esObjeto = (v: unknown): v is Record<string, unknown> =>
-  typeof v === 'object' && v !== null && !Array.isArray(v);
 const texto = (v: unknown) => (typeof v === 'string' ? v.trim() : '');
 const entero = (v: unknown, min: number, max: number): v is number =>
   Number.isInteger(v) && (v as number) >= min && (v as number) <= max;
@@ -74,7 +70,7 @@ function esUrlImagen(v: unknown) {
 
 // Valida los datos que llegan del panel de administración y los normaliza.
 export function validarProducto(datos: unknown): ProductoEntrada {
-  const o = esObjeto(datos) ? datos : {};
+  const o = objeto(datos);
   const errores: string[] = [];
 
   const slug = texto(o.slug);
@@ -102,7 +98,7 @@ export function validarProducto(datos: unknown): ProductoEntrada {
   if (crudas.length === 0 || crudas.length > 200) errores.push('Variantes: entre 1 y 200');
   const skus = new Set<string>();
   const variantes = crudas.map((cruda, i): VarianteEntrada => {
-    const v = esObjeto(cruda) ? cruda : {};
+    const v = objeto(cruda);
     const sku = texto(v.sku);
     if (!SKU.test(sku)) errores.push(`Variante ${i + 1}: SKU inválido (letras, números, . _ -)`);
     else if (skus.has(sku)) errores.push(`Variante ${i + 1}: SKU repetido "${sku}"`);

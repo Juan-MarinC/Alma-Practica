@@ -80,7 +80,3 @@ export function rutaSegura(v: unknown, porDefecto = "/cuenta") {
   return typeof v === "string" && /^\/(?![/\\])[^\s]*$/.test(v) && v.length < 200 ? v : porDefecto;
 }
 
-export async function erroresDe(r: Response, porDefecto: string): Promise<string[]> {
-  const cuerpo = await r.json().catch(() => ({}));
-  return Array.isArray(cuerpo.errores) ? cuerpo.errores : [porDefecto];
-}

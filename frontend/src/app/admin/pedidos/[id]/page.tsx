@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { FormEstadoPedido } from "@/components/admin/form-estado-pedido";
 import { exigirAdmin, obtenerPedidoAdmin } from "@/lib/admin";
-import { formatoPrecio } from "@/lib/format";
+import { LineasPedido, TotalesPedido } from "@/components/resumen-pedido";
 import { cambiarEstadoPedido } from "../../acciones";
 import { EtiquetaEstado } from "../etiqueta-estado";
 
@@ -25,22 +25,8 @@ async function Detalle({ params }: { params: PageProps<"/admin/pedidos/[id]">["p
         <div className="space-y-6">
           <section className="tarjeta-admin">
             <h2 className="mb-4 font-serif text-2xl">Productos</h2>
-            <ul className="space-y-3 text-sm">
-              {p.lineas.map((l, i) => (
-                <li key={i} className="flex justify-between gap-3">
-                  <span>
-                    {l.nombre} <span className="text-cacao/70">× {l.cantidad}</span>
-                    {Object.keys(l.opciones).length > 0 && <span className="block text-xs text-cacao/70">{Object.values(l.opciones).join(" · ")}</span>}
-                  </span>
-                  <span>{formatoPrecio(l.precioUnitario * l.cantidad)}</span>
-                </li>
-              ))}
-            </ul>
-            <dl className="mt-4 space-y-1 border-t border-cacao/10 pt-4 text-sm">
-              <div className="flex justify-between"><dt>Subtotal</dt><dd>{formatoPrecio(p.subtotal)}</dd></div>
-              <div className="flex justify-between"><dt>Envío</dt><dd>{formatoPrecio(p.costoEnvio)}</dd></div>
-              <div className="flex justify-between font-medium"><dt>Total</dt><dd>{formatoPrecio(p.total)}</dd></div>
-            </dl>
+            <LineasPedido lineas={p.lineas} />
+            <TotalesPedido subtotal={p.subtotal} envio={p.costoEnvio} total={p.total} />
           </section>
 
           <section className="tarjeta-admin grid gap-6 text-sm sm:grid-cols-2">

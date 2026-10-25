@@ -5,6 +5,12 @@ import { tonos, type Producto } from "./data";
 export const API_URL = process.env.API_URL ?? "http://localhost:4000/api";
 export const TAG_PRODUCTOS = "productos";
 
+/** Errores de validación que devuelve el API (`{ errores: [...] }`) o un mensaje por defecto. */
+export async function erroresDe(r: Response, porDefecto: string): Promise<string[]> {
+  const cuerpo = await r.json().catch(() => ({}));
+  return Array.isArray(cuerpo.errores) ? cuerpo.errores : [porDefecto];
+}
+
 export type ProductoApi = Omit<Producto, "precioAntes" | "tono" | "opciones"> & {
   id: string;
   precioAntes: number | null;
@@ -12,7 +18,7 @@ export type ProductoApi = Omit<Producto, "precioAntes" | "tono" | "opciones"> & 
   stockTotal: number;
 };
 
-export function aTienda(p: ProductoApi): Producto {
+function aTienda(p: ProductoApi): Producto {
   // Las opciones (Talla, Color...) se deducen de las variantes, en el orden en que aparecen.
   const opciones: Producto["opciones"] = [];
   for (const v of p.variantes) {

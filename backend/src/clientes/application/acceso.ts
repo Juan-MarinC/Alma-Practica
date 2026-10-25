@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { CORREO, type Correo } from '../../shared/correo/correo.js';
 import { intentos, MINUTO, olvidarIntentos, sumarIntento } from '../../shared/limite.js';
+import { objeto } from '../../shared/validacion.js';
 import {
   CredencialesInvalidas,
   DatosInvalidos,
@@ -46,7 +47,7 @@ export class IniciarSesion {
 
   /** Mismo error y mismo tiempo de respuesta si el correo no existe o la contraseña no coincide. */
   async ejecutar(datos: unknown) {
-    const o = (typeof datos === 'object' && datos !== null ? datos : {}) as Record<string, unknown>;
+    const o = objeto(datos);
     const email = normalizarEmail(o.email);
     const contrasena = typeof o.contrasena === 'string' ? o.contrasena : '';
     if (!email || !contrasena || contrasena.length > 128) throw new DatosInvalidos(['Escribe tu correo y tu contraseña']);
@@ -93,7 +94,7 @@ export class IniciarGoogle {
 
   ejecutar(datos: unknown) {
     if (!this.google.configurado()) throw new GoogleNoConfigurado();
-    const o = (typeof datos === 'object' && datos !== null ? datos : {}) as Record<string, unknown>;
+    const o = objeto(datos);
     if (typeof o.estado !== 'string' || !BASE64URL.test(o.estado) || typeof o.retoPkce !== 'string' || !BASE64URL.test(o.retoPkce))
       throw new DatosInvalidos(['Solicitud de inicio con Google inválida']);
     return this.google.urlAutorizacion(o.estado, o.retoPkce);
@@ -113,7 +114,7 @@ export class TerminarGoogle {
    */
   async ejecutar(datos: unknown) {
     if (!this.google.configurado()) throw new GoogleNoConfigurado();
-    const o = (typeof datos === 'object' && datos !== null ? datos : {}) as Record<string, unknown>;
+    const o = objeto(datos);
     if (typeof o.codigo !== 'string' || o.codigo.length > 512 || typeof o.verificadorPkce !== 'string' || !BASE64URL.test(o.verificadorPkce))
       throw new DatosInvalidos(['Respuesta de Google inválida']);
 

@@ -15,7 +15,7 @@ import {
   restablecer,
   type EstadoCuenta,
 } from "@/app/(tienda)/cuenta/acciones";
-import { departamentos } from "@/lib/colombia";
+import { CamposDireccion } from "@/components/campos-direccion";
 import type { Cuenta, Direccion } from "@/lib/cuenta";
 import { sinReiniciar } from "@/lib/formularios";
 
@@ -188,20 +188,7 @@ export function Direcciones({ direcciones }: { direcciones: Direccion[] }) {
       <details className="rounded-2xl ring-1 ring-cacao/10" open={direcciones.length === 0}>
         <summary className="cursor-pointer list-none rounded-2xl px-4 py-3 text-sm font-medium text-cacao hover:bg-cacao/5">+ Agregar dirección</summary>
         <form action={accion} onSubmit={sinReiniciar(accion)} className="grid gap-4 border-t border-cacao/10 p-4 md:grid-cols-2">
-          <label>
-            <span className="etiqueta">Departamento</span>
-            <select name="departamento" required defaultValue="" autoComplete="address-level1" className="campo">
-              <option value="" disabled>Elige…</option>
-              {departamentos.map((d) => <option key={d}>{d}</option>)}
-            </select>
-          </label>
-          <Campo etiqueta="Ciudad o municipio" name="ciudad" required maxLength={80} autoComplete="address-level2" />
-          <div className="md:col-span-2">
-            <Campo etiqueta="Dirección" name="direccion" required minLength={5} maxLength={200} autoComplete="street-address" placeholder="Calle 10 # 20-30, apto 501" />
-          </div>
-          <div className="md:col-span-2">
-            <Campo etiqueta="Indicaciones (opcional)" name="indicaciones" maxLength={200} placeholder="Barrio, torre, portería…" />
-          </div>
+          <CamposDireccion />
           <div className="space-y-3 md:col-span-2">
             <Mensajes estado={estado} />
             <button disabled={enviando} className="boton-primario">{enviando ? "Guardando…" : "Guardar dirección"}</button>

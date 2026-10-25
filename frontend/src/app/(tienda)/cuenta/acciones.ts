@@ -2,7 +2,8 @@
 
 import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
-import { abrirSesionCliente, apiCuenta, cerrarSesionCliente, erroresDe, rutaSegura } from "@/lib/cuenta";
+import { erroresDe } from "@/lib/api";
+import { abrirSesionCliente, apiCuenta, cerrarSesionCliente, rutaSegura } from "@/lib/cuenta";
 import { excedeLimite, ipCliente, MINUTO } from "@/lib/limite";
 
 export type EstadoCuenta = { errores: string[]; ok?: string };

@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { CORREO, type Correo } from '../../shared/correo/correo.js';
 import { MINUTO, olvidarIntentos, sumarIntento } from '../../shared/limite.js';
+import { objeto } from '../../shared/validacion.js';
 import {
   DatosInvalidos,
   DemasiadosIntentos,
@@ -13,7 +14,6 @@ import { REPOSITORIO_CLIENTES, type RepositorioClientes } from '../domain/reposi
 import { hashContrasena, hashToken, verificarContrasena } from '../domain/secretos.js';
 import { enviarEnlace } from './comun.js';
 
-const objeto = (v: unknown) => (typeof v === 'object' && v !== null ? v : {}) as Record<string, unknown>;
 const tokenDe = (v: unknown) => (typeof v === 'string' && /^[A-Za-z0-9_-]{20,100}$/.test(v) ? v : null);
 
 @Injectable()

@@ -4,12 +4,13 @@ import { Lock } from "lucide-react";
 import Link from "next/link";
 import { useActionState, useState } from "react";
 import { crearPedido } from "@/app/(tienda)/checkout/acciones";
-import { departamentos } from "@/lib/colombia";
 import { tienda } from "@/lib/config";
 import type { Direccion } from "@/lib/cuenta";
 import { formatoPrecio } from "@/lib/format";
 import { sinReiniciar } from "@/lib/formularios";
+import { CamposDireccion } from "./campos-direccion";
 import { useCarrito } from "./carrito";
+import { TotalesPedido } from "./resumen-pedido";
 
 type DatosCuenta = { nombre: string; email: string; telefono: string | null };
 
@@ -85,25 +86,7 @@ export function Checkout({ cuenta = null, direcciones = [] }: { cuenta?: DatosCu
           )}
           {/* key: al cambiar de dirección guardada los campos se vuelven a llenar con sus datos. */}
           <div key={String(elegida)} className="clear-left grid gap-4 md:grid-cols-2">
-          <label>
-            <span className="etiqueta">Departamento</span>
-            <select name="departamento" required defaultValue={dir?.departamento ?? ""} autoComplete="address-level1" className="campo">
-              <option value="" disabled>Elige…</option>
-              {departamentos.map((d) => <option key={d}>{d}</option>)}
-            </select>
-          </label>
-          <label>
-            <span className="etiqueta">Ciudad o municipio</span>
-            <input name="ciudad" required maxLength={80} autoComplete="address-level2" defaultValue={dir?.ciudad} className="campo" />
-          </label>
-          <label className="md:col-span-2">
-            <span className="etiqueta">Dirección</span>
-            <input name="direccion" required minLength={5} maxLength={200} autoComplete="street-address" placeholder="Calle 10 # 20-30, apto 501" defaultValue={dir?.direccion} className="campo" />
-          </label>
-          <label className="md:col-span-2">
-            <span className="etiqueta">Indicaciones (opcional)</span>
-            <input name="indicaciones" maxLength={200} placeholder="Barrio, torre, portería…" defaultValue={dir?.indicaciones} className="campo" />
-          </label>
+            <CamposDireccion inicial={dir} />
           {cuenta && elegida === "nueva" && (
             <label className="flex items-center gap-3 text-sm text-cacao/85 md:col-span-2">
               <input type="checkbox" name="guardarDireccion" defaultChecked className="size-4 accent-cacao" />
@@ -137,11 +120,7 @@ export function Checkout({ cuenta = null, direcciones = [] }: { cuenta?: DatosCu
             </li>
           ))}
         </ul>
-        <dl className="mt-4 space-y-1 border-t border-cacao/10 pt-4 text-sm">
-          <div className="flex justify-between"><dt>Subtotal</dt><dd>{formatoPrecio(subtotal)}</dd></div>
-          <div className="flex justify-between"><dt>Envío</dt><dd>{envio === 0 ? "Gratis" : formatoPrecio(envio)}</dd></div>
-          <div className="flex justify-between pt-2 text-base font-medium"><dt>Total</dt><dd>{formatoPrecio(subtotal + envio)}</dd></div>
-        </dl>
+        <TotalesPedido subtotal={subtotal} envio={envio} total={subtotal + envio} />
         <button disabled={enviando} className="boton-primario mt-6 w-full py-3.5">
           <Lock className="size-4" /> {enviando ? "Preparando el pago…" : "Pagar con Wompi"}
         </button>

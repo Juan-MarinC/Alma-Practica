@@ -2,7 +2,7 @@ import { createHash, createHmac, timingSafeEqual } from "node:crypto";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { connection } from "next/server";
-import { API_URL, type ProductoApi } from "./api";
+import { API_URL, erroresDe, type ProductoApi } from "./api";
 
 // Solo para código de servidor (páginas y acciones de /admin): usa secretos del entorno.
 const COOKIE = "alma_admin";
@@ -18,7 +18,7 @@ const firmar = (exp: number) => createHmac("sha256", token()).update(`admin:${ex
 const digerir = (s: string) => createHash("sha256").update(s).digest();
 const iguales = (a: string, b: string) => timingSafeEqual(digerir(a), digerir(b));
 
-export async function haySesion() {
+async function haySesion() {
   await connection(); // usa la hora actual: siempre se evalúa en la petición, nunca al prerenderizar
   const [exp, firma] = ((await cookies()).get(COOKIE)?.value ?? "").split(".");
   return !!exp && !!firma && Number(exp) > Date.now() / 1000 && iguales(firma, firmar(Number(exp)));
@@ -54,11 +54,8 @@ function llamarApi(ruta: string, init?: RequestInit) {
   });
 }
 
-export async function listarProductosAdmin(): Promise<ProductoApi[]> {
-  const r = await llamarApi("/productos");
-  if (r.status === 401) throw new Error("El backend rechazó ADMIN_TOKEN: debe ser igual en backend/.env y frontend/.env.local");
-  if (!r.ok) throw new Error(`El API respondió ${r.status}`);
-  return r.json();
+export async function listarProductosAdmin() {
+  return leerJson<ProductoApi[]>(await llamarApi("/productos"));
 }
 
 /** Crea (sin slugActual) o edita un producto. Devuelve los errores para mostrarlos en el formulario. */
@@ -67,10 +64,7 @@ export async function enviarProducto(datos: unknown, slugActual: string | null):
     method: slugActual ? "PUT" : "POST",
     body: JSON.stringify(datos),
   });
-  if (r.ok) return [];
-  const cuerpo = await r.json().catch(() => ({}));
-  if (Array.isArray(cuerpo.errores)) return cuerpo.errores;
-  return [r.status === 401 ? "El backend rechazó ADMIN_TOKEN" : `Error inesperado del API (${r.status})`];
+  return r.ok ? [] : erroresDe(r, r.status === 401 ? "El backend rechazó ADMIN_TOKEN" : `Error inesperado del API (${r.status})`);
 }
 
 export type EstadoPedido = "pendiente_pago" | "pagado" | "preparando" | "enviado" | "entregado" | "cancelado";
@@ -119,7 +113,5 @@ export async function obtenerPedidoAdmin(id: string): Promise<PedidoAdmin | null
 
 export async function actualizarPedido(id: string, cambio: { estado: string; guiaEnvio: string }): Promise<string[]> {
   const r = await llamarApi(`/pedidos/${encodeURIComponent(id)}`, { method: "PATCH", body: JSON.stringify(cambio) });
-  if (r.ok) return [];
-  const cuerpo = await r.json().catch(() => ({}));
-  return Array.isArray(cuerpo.errores) ? cuerpo.errores : [`Error inesperado del API (${r.status})`];
+  return r.ok ? [] : erroresDe(r, `Error inesperado del API (${r.status})`);
 }
