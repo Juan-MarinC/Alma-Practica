@@ -98,9 +98,9 @@ export class RepositorioClientesMemoria implements RepositorioClientes {
     for (const e of this.enlaces.values()) if (e.clienteId === clienteId && e.tipo === tipo) e.usado = true;
     this.enlaces.set(tokenHash, { clienteId, tipo, expira, usado: false });
   }
-  async usarEnlace(tokenHash: string, tipo: TipoEnlace) {
+  async usarEnlace(tokenHash: string, tipo: TipoEnlace, clienteId?: string) {
     const e = this.enlaces.get(tokenHash);
-    if (!e || e.tipo !== tipo || e.usado || e.expira <= new Date()) return null;
+    if (!e || e.tipo !== tipo || e.usado || e.expira <= new Date() || (clienteId && e.clienteId !== clienteId)) return null;
     e.usado = true;
     return e.clienteId;
   }

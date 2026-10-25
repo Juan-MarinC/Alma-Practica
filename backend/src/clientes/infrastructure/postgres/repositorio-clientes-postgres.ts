@@ -127,13 +127,13 @@ export class RepositorioClientesPostgres implements RepositorioClientes {
     ]);
   }
 
-  async usarEnlace(tokenHash: string, tipo: TipoEnlace) {
+  async usarEnlace(tokenHash: string, tipo: TipoEnlace, clienteId?: string) {
     // Un solo UPDATE: dos clics simultáneos en el mismo enlace no pueden usarlo dos veces.
     const { rows } = await this.pool.query<{ cliente_id: string }>(
       `UPDATE enlaces_cliente SET usado_en = now()
-       WHERE token_hash = $1 AND tipo = $2 AND usado_en IS NULL AND expira > now()
+       WHERE token_hash = $1 AND tipo = $2 AND usado_en IS NULL AND expira > now() AND ($3::uuid IS NULL OR cliente_id = $3)
        RETURNING cliente_id`,
-      [tokenHash, tipo],
+      [tokenHash, tipo, clienteId ?? null],
     );
     return rows[0]?.cliente_id ?? null;
   }

@@ -95,6 +95,16 @@ describe('Cuentas de clientas', () => {
     await expect(entrar.ejecutar({ email: 'bloqueo@correo.co', contrasena: 'una-clave-larga-1' })).rejects.toThrow(DemasiadosIntentos);
   });
 
+  it('restablecer la contraseña quita el bloqueo por intentos fallidos', async () => {
+    const { repo, correo, registrar, entrar } = entorno();
+    await registrar.ejecutar(datos({ email: 'bloqueada@correo.co' }));
+    for (let i = 0; i < 10; i++) await expect(entrar.ejecutar({ email: 'bloqueada@correo.co', contrasena: `mala-clave-${i}` })).rejects.toThrow();
+    await expect(entrar.ejecutar({ email: 'bloqueada@correo.co', contrasena: 'una-clave-larga-1' })).rejects.toThrow(DemasiadosIntentos);
+    await new SolicitarRestablecer(repo, correo).ejecutar({ email: 'bloqueada@correo.co' });
+    await new RestablecerContrasena(repo).ejecutar({ token: correo.ultimoToken(), contrasena: 'clave-nueva-larga' });
+    await expect(entrar.ejecutar({ email: 'bloqueada@correo.co', contrasena: 'clave-nueva-larga' })).resolves.toBeTruthy();
+  });
+
   it('restablece la contraseña con el enlace (un solo uso) y cierra todas las sesiones', async () => {
     const { repo, correo, registrar, entrar, sesion } = entorno();
     const token = await registrar.ejecutar(datos({ email: 'olvido@correo.co' }));
@@ -134,8 +144,18 @@ describe('Cuentas de clientas', () => {
     repo.pedidosGuardados.push({ ...base, id: 'p3', numero: 3, clienteId: null, email: 'otra@correo.co' });
     const pedidos = new PedidosDeCliente(repo);
     expect((await pedidos.ejecutar(id)).map((p) => p.id)).toEqual(['p2']);
-    await new VerificarEmail(repo).ejecutar({ token: correo.ultimoToken() });
+    await new VerificarEmail(repo).ejecutar(id, { token: correo.ultimoToken() });
     expect((await pedidos.ejecutar(id)).map((p) => p.id)).toEqual(['p1', 'p2']);
+  });
+
+  it('el enlace de confirmación solo sirve con la sesión de la misma cuenta', async () => {
+    const { repo, correo, registrar, sesion } = entorno();
+    const intruso = (await sesion.ejecutar(await registrar.ejecutar(datos({ email: 'ajeno@correo.co' }))))!;
+    const enlace = correo.ultimoToken();
+    const otra = (await sesion.ejecutar(await registrar.ejecutar(datos({ email: 'otra@correo.co' }))))!;
+    // La dueña del correo abre el enlace estando en otra cuenta (o sin sesión): no confirma la cuenta del intruso.
+    await expect(new VerificarEmail(repo).ejecutar(otra, { token: enlace })).rejects.toThrow(EnlaceInvalido);
+    expect((await repo.porId(intruso))?.emailVerificado).toBe(false);
   });
 
   it('cada clienta solo borra sus direcciones y eliminar la cuenta borra todo menos los pedidos', async () => {
@@ -184,7 +204,7 @@ describe('Inicio con Google', () => {
   it('une la cuenta existente con el mismo correo y rechaza correos sin confirmar', async () => {
     const { repo, correo, registrar, sesion } = entorno();
     const id = await sesion.ejecutar(await registrar.ejecutar(datos({ email: 'mia@gmail.com' })));
-    await new VerificarEmail(repo).ejecutar({ token: correo.ultimoToken() }); // la dueña ya había confirmado su correo
+    await new VerificarEmail(repo).ejecutar(id!, { token: correo.ultimoToken() }); // la dueña ya había confirmado su correo
     const unida = await new TerminarGoogle(repo, google({ sub: 'g-2', email: 'mia@gmail.com', emailVerificado: true, nombre: 'Mía' })).ejecutar(pkce);
     expect(await sesion.ejecutar(unida)).toBe(id);
     expect(await repo.porId(id!)).toMatchObject({ conGoogle: true, emailVerificado: true, tieneContrasena: true });

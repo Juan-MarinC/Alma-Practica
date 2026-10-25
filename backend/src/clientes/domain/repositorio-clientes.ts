@@ -30,8 +30,11 @@ export interface RepositorioClientes {
   cerrarSesiones(clienteId: string, excepto?: string): Promise<void>;
 
   guardarEnlace(tokenHash: string, clienteId: string, tipo: TipoEnlace, expira: Date): Promise<void>;
-  /** Marca el enlace como usado y devuelve la clienta, solo si existe, es de ese tipo, no se ha usado y no ha vencido. */
-  usarEnlace(tokenHash: string, tipo: TipoEnlace): Promise<string | null>;
+  /**
+   * Marca el enlace como usado y devuelve la clienta, solo si existe, es de ese tipo, no se ha usado, no ha vencido
+   * y, si se indica `clienteId`, es de esa clienta.
+   */
+  usarEnlace(tokenHash: string, tipo: TipoEnlace, clienteId?: string): Promise<string | null>;
 
   /** Pedidos de la cuenta y, si `emailVerificado` viene, también los hechos como invitada con ese correo. */
   pedidos(clienteId: string, emailVerificado: string | null): Promise<PedidoCliente[]>;

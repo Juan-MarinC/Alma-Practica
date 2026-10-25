@@ -69,7 +69,6 @@ export class ClientesController {
     private readonly terminarGoogle: TerminarGoogle,
     private readonly solicitarRestablecer: SolicitarRestablecer,
     private readonly restablecer: RestablecerContrasena,
-    private readonly verificar: VerificarEmail,
   ) {}
 
   @Post('registro')
@@ -103,12 +102,6 @@ export class ClientesController {
     await this.restablecer.ejecutar(datos).catch(aHttp);
   }
 
-  @Post('email/verificar')
-  @HttpCode(204)
-  async confirmarEmail(@Body() datos: unknown) {
-    await this.verificar.ejecutar(datos).catch(aHttp);
-  }
-
   @Post('google/inicio')
   @HttpCode(200)
   google(@Body() datos: unknown) {
@@ -135,6 +128,7 @@ export class CuentaController {
     private readonly eliminar: EliminarCuenta,
     private readonly cambiarContrasena: CambiarContrasena,
     private readonly reenviar: ReenviarVerificacion,
+    private readonly verificar: VerificarEmail,
     private readonly pedidosDe: PedidosDeCliente,
     private readonly listarDirecciones: ListarDirecciones,
     private readonly agregarDireccion: AgregarDireccion,
@@ -167,6 +161,13 @@ export class CuentaController {
   @HttpCode(204)
   async reenviarVerificacion(@ClienteActual() c: ClienteEnSesion) {
     await this.reenviar.ejecutar(c.id).catch(aHttp);
+  }
+
+  // Con sesión: el enlace solo confirma el correo de la cuenta que lo abre (ver VerificarEmail).
+  @Post('email/verificar')
+  @HttpCode(204)
+  async confirmarEmail(@ClienteActual() c: ClienteEnSesion, @Body() datos: unknown) {
+    await this.verificar.ejecutar(c.id, datos).catch(aHttp);
   }
 
   @Get('pedidos')

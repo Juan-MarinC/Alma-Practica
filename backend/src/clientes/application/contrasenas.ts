@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { CORREO, type Correo } from '../../shared/correo/correo.js';
-import { MINUTO, sumarIntento } from '../../shared/limite.js';
+import { MINUTO, olvidarIntentos, sumarIntento } from '../../shared/limite.js';
 import {
   DatosInvalidos,
   DemasiadosIntentos,
@@ -76,6 +76,8 @@ export class RestablecerContrasena {
     await this.repo.cambiarContrasena(clienteId, await hashContrasena(contrasena));
     await this.repo.marcarEmailVerificado(clienteId);
     await this.repo.cerrarSesiones(clienteId);
+    // Quien bloqueó la cuenta fallando contraseñas a propósito no le impide entrar con la nueva.
+    if (cliente) olvidarIntentos(`login:${cliente.email}`);
   }
 }
 
@@ -83,10 +85,13 @@ export class RestablecerContrasena {
 export class VerificarEmail {
   constructor(@Inject(REPOSITORIO_CLIENTES) private readonly repo: RepositorioClientes) {}
 
-  async ejecutar(datos: unknown) {
+  /**
+   * Solo con la sesión de la misma cuenta: si alguien creó la cuenta con un correo ajeno, que la dueña (o el
+   * antivirus de su correo) abra el enlace no le confirma esa cuenta a quien la creó.
+   */
+  async ejecutar(clienteId: string, datos: unknown) {
     const token = tokenDe(objeto(datos).token);
-    const clienteId = token && (await this.repo.usarEnlace(hashToken(token), 'verificar_email'));
-    if (!clienteId) throw new EnlaceInvalido();
+    if (!token || !(await this.repo.usarEnlace(hashToken(token), 'verificar_email', clienteId))) throw new EnlaceInvalido();
     await this.repo.marcarEmailVerificado(clienteId);
   }
 }
